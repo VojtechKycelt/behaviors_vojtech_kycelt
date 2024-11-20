@@ -1,0 +1,218 @@
+{
+  "name": "wait and listen",
+  "id": "d78bd913-1f1b-42c2-bdb7-f5329855df7a",
+  "type": "supervisedParallel",
+  "subtrees": [
+    {
+      "name": "Wait Forever",
+      "id": "bb4a3ad6-dba8-4574-8ca3-5ac83fde2c15",
+      "type": "waitForever"
+    },
+    {
+      "name": "Find Pos to Move to",
+      "id": "45871188-ca54-43ec-b8b2-4212d5a0c8f6",
+      "type": "sequence",
+      "subtrees": [
+        {
+          "name": "Ask for path",
+          "id": "ba0ba4c1-fce7-4551-b0cc-794e7689cfea",
+          "type": "scriptAction",
+          "decorators": [
+            {
+              "id": "73ce33f2-3c02-497b-bd9f-f812e3d0ee11",
+              "type": "waitUntil",
+              "name": "Wait Until Path Ready",
+              "condition": [
+                "return loc.lastKnownMinotaurPosition ~= nil"
+              ]
+            }
+          ],
+          "script": [
+            "if loc.lastKnownMinotaurPosition ~= nil then",
+            "    loc.pathQuery = FindPath(self:GetPosition(),loc.lastKnownMinotaurPosition)",
+            "end"
+          ]
+        },
+        {
+          "name": "Fetch path",
+          "id": "af5f64ad-81c3-49c3-b484-2024c6b5bfa1",
+          "type": "scriptAction",
+          "decorators": [
+            {
+              "id": "224f0d20-657a-41d6-a405-6ee09d470ce8",
+              "type": "waitUntil",
+              "name": "Wait Until Path Ready",
+              "condition": [
+                "return loc.pathQuery:IsReady()"
+              ]
+            }
+          ],
+          "script": [
+            "loc.path = loc.pathQuery:Value()"
+          ]
+        },
+        {
+          "name": "DRAW PATH",
+          "id": "5421309e-8dae-488f-af1a-8e32624ab197",
+          "type": "scriptAction",
+          "decorators": [
+            {
+              "id": "f9a2db05-2119-4f28-a1bc-cd100eb7e307",
+              "type": "loopForever",
+              "name": "Draw line"
+            }
+          ],
+          "script": [
+            "if",
+            "    loc.path ~= nil",
+            "then",
+            "    local OFFSET = Vec3(0,0,2)",
+            "    ai_core_public.draw.Path(",
+            "        loc.path,",
+            "        1, 0, 1, 1,",
+            "        OFFSET",
+            "    )",
+            "end"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "wait for message and draw line",
+      "id": "ad145cf5-8d38-42b9-a608-fffce5a30a6f",
+      "type": "sequence",
+      "subtrees": [
+        {
+          "name": "Update minotaur position",
+          "id": "3158cec4-ab07-4c7a-84f7-710d01746d6e",
+          "type": "messageHandler",
+          "handler": [
+            "if msg.value.position then",
+            "\tloc.lastKnownMinotaurPosition = msg.value.position",
+            "end"
+          ]
+        },
+        {
+          "name": "Draw line and wait",
+          "id": "39fbf2a7-62c2-4c12-91dd-bc281f9a8246",
+          "type": "parallel",
+          "subtrees": [
+            {
+              "name": "DRAW LINE FROM THESEUSUS TO LASTKNOWNMINOTAURPOSITION",
+              "id": "968ab992-35ff-4c16-8c47-d42467b7d559",
+              "type": "scriptAction",
+              "decorators": [
+                {
+                  "id": "76edc325-d3f2-469e-b152-802453ac5801",
+                  "type": "loopForever",
+                  "name": "Draw line"
+                }
+              ],
+              "script": [
+                "if",
+                "    loc.lastKnownMinotaurPosition ~= nil",
+                "then",
+                "    local OFFSET = Vec3(0,0,2)",
+                "    ai_core_public.draw.Line(",
+                "        self:GetPosition() + OFFSET,",
+                "        loc.lastKnownMinotaurPosition + OFFSET,",
+                "        0, 0, 1, 1",
+                "    )",
+                "end"
+              ]
+            },
+            {
+              "name": "wait 2s",
+              "id": "ef7b2928-da1f-413a-8614-478503b616ec",
+              "type": "wait",
+              "time": [
+                "return 2"
+              ]
+            }
+          ],
+          "waitForAll": false
+        }
+      ]
+    }
+  ],
+  "unlinked-trees": [
+    {
+      "name": "Find Minotaur",
+      "id": "50b16405-acbf-4ec5-ae0d-e8be65387270",
+      "type": "scriptAction",
+      "meta": {
+        "nodesInfo": [
+          {
+            "id": "50b16405-acbf-4ec5-ae0d-e8be65387270",
+            "position": "1800,295"
+          }
+        ],
+        "editorObjects": []
+      }
+    }
+  ],
+  "meta": {
+    "nodesInfo": [
+      {
+        "id": "d78bd913-1f1b-42c2-bdb7-f5329855df7a",
+        "position": "1890.5,111.2"
+      },
+      {
+        "id": "bb4a3ad6-dba8-4574-8ca3-5ac83fde2c15",
+        "position": "1400,182.5"
+      },
+      {
+        "id": "45871188-ca54-43ec-b8b2-4212d5a0c8f6",
+        "position": "1625,245"
+      },
+      {
+        "id": "ba0ba4c1-fce7-4551-b0cc-794e7689cfea",
+        "position": "1287.5,520"
+      },
+      {
+        "id": "af5f64ad-81c3-49c3-b484-2024c6b5bfa1",
+        "position": "1462.5,520"
+      },
+      {
+        "id": "5421309e-8dae-488f-af1a-8e32624ab197",
+        "position": "1687.5,507.5"
+      },
+      {
+        "id": "ad145cf5-8d38-42b9-a608-fffce5a30a6f",
+        "position": "2092.1,268"
+      },
+      {
+        "id": "3158cec4-ab07-4c7a-84f7-710d01746d6e",
+        "position": "1982.5,365.6"
+      },
+      {
+        "id": "39fbf2a7-62c2-4c12-91dd-bc281f9a8246",
+        "position": "2335.3,379.2"
+      },
+      {
+        "id": "968ab992-35ff-4c16-8c47-d42467b7d559",
+        "position": "1962.5,482.5"
+      },
+      {
+        "id": "ef7b2928-da1f-413a-8614-478503b616ec",
+        "position": "2518.85555555555,490.488888888889"
+      }
+    ],
+    "editorObjects": [],
+    "canvasSize": "3840,2420",
+    "gridPadding": "0,7.5"
+  },
+  "parameters": [
+    {
+      "name": "orderData",
+      "isOptional": false,
+      "defaultValue": "",
+      "evaluation": "passByReference"
+    }
+  ],
+  "locals": {
+    "lastKnownMinotaurPosition": "return nil",
+    "path": "return nil",
+    "pathQuery": "return nil"
+  }
+}

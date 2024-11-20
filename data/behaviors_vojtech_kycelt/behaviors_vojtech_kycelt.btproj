@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Default</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>59B20EC6-A96B-407D-83AE-55A6E8D2C851</ProjectGuid>
+    <Name>behaviors_vojtech_kycelt</Name>
+    <RootNamespace>behaviors_vojtech_kycelt</RootNamespace>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Default' ">
+    <OutputPath>.</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="classes.lua">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Theseus\Listen.bt">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Theseus\Theseus.class.lua">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="wait.bt">
+      <SubType>Content</SubType>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Theseus" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+</Project>
