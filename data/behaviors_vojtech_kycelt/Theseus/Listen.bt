@@ -9,88 +9,6 @@
       "type": "waitForever"
     },
     {
-      "name": "Find Pos to Move to",
-      "id": "45871188-ca54-43ec-b8b2-4212d5a0c8f6",
-      "type": "sequence",
-      "subtrees": [
-        {
-          "name": "Ask for path",
-          "id": "ba0ba4c1-fce7-4551-b0cc-794e7689cfea",
-          "type": "scriptAction",
-          "decorators": [
-            {
-              "id": "73ce33f2-3c02-497b-bd9f-f812e3d0ee11",
-              "type": "waitUntil",
-              "name": "Wait Until Path Ready",
-              "condition": [
-                "return loc.lastKnownMinotaurPosition ~= nil"
-              ]
-            }
-          ],
-          "script": [
-            "if loc.lastKnownMinotaurPosition ~= nil then",
-            "    loc.pathQuery = FindPath(self:GetPosition(),loc.lastKnownMinotaurPosition)",
-            "end"
-          ]
-        },
-        {
-          "name": "Fetch path",
-          "id": "af5f64ad-81c3-49c3-b484-2024c6b5bfa1",
-          "type": "scriptAction",
-          "decorators": [
-            {
-              "id": "224f0d20-657a-41d6-a405-6ee09d470ce8",
-              "type": "waitUntil",
-              "name": "Wait Until Path Ready",
-              "condition": [
-                "return loc.pathQuery:IsReady()"
-              ]
-            }
-          ],
-          "script": [
-            "loc.path = loc.pathQuery:Value()"
-          ]
-        },
-        {
-          "name": "DRAW PATH",
-          "id": "5421309e-8dae-488f-af1a-8e32624ab197",
-          "type": "scriptAction",
-          "decorators": [
-            {
-              "id": "f9a2db05-2119-4f28-a1bc-cd100eb7e307",
-              "type": "loopForever",
-              "name": "Draw line"
-            }
-          ],
-          "script": [
-            "if",
-            "    loc.path ~= nil",
-            "then",
-            "    local OFFSET = Vec3(0,0,2)",
-            "    ai_core_public.draw.Path(",
-            "        loc.path,",
-            "        1, 0, 1, 1,",
-            "        OFFSET",
-            "    )",
-            "    ",
-            "    local last_dir = self:GetHeading()",
-            "    for step = 1, loc.path:Length(), 2 do",
-            "        local dir = loc.path:DirectionAlongPath(step)",
-            "        local turn = MathExt.AngleDiff(dir, last_dir)",
-            "        if math.abs(turn) > 30 then",
-            "            ai_core_public.draw.Circle(",
-            "                loc.path:PositionAlongPath(step) + OFFSET, 2, 1, 0, 1, 1",
-            "            )",
-            "        end",
-            "        last_dir = dir",
-            "    end",
-            "    ",
-            "end"
-          ]
-        }
-      ]
-    },
-    {
       "name": "wait for message and draw line",
       "id": "ad145cf5-8d38-42b9-a608-fffce5a30a6f",
       "type": "sequence",
@@ -146,96 +64,301 @@
           "waitForAll": false
         }
       ]
-    }
-  ],
-  "unlinked-trees": [
-    {
-      "name": "Find Minotaur",
-      "id": "50b16405-acbf-4ec5-ae0d-e8be65387270",
-      "type": "scriptAction",
-      "meta": {
-        "nodesInfo": [
-          {
-            "id": "50b16405-acbf-4ec5-ae0d-e8be65387270",
-            "position": "1975,695.1"
-          }
-        ],
-        "editorObjects": []
-      }
     },
     {
-      "name": "<unnamed>",
-      "id": "ec114c31-3640-4fe3-823e-e67cfbdb7da6",
-      "type": "scriptCondition",
-      "meta": {
-        "nodesInfo": [
-          {
-            "id": "ec114c31-3640-4fe3-823e-e67cfbdb7da6",
-            "position": "1837.5,782.6"
-          }
-        ],
-        "editorObjects": []
-      },
-      "script": [
-        "",
-        "DebugLog('loc.path: '..tostring(loc.path))",
-        "DebugLog('pathQuery: '..tostring(loc.pathQuery:Value()))",
-        "if loc.path == loc.pathQuery:Value() then",
-        "\treturn true",
-        "return false"
+      "name": "Find Pos to Move to",
+      "id": "45871188-ca54-43ec-b8b2-4212d5a0c8f6",
+      "type": "sequence",
+      "subtrees": [
+        {
+          "name": "Ask for path",
+          "id": "ba0ba4c1-fce7-4551-b0cc-794e7689cfea",
+          "type": "scriptAction",
+          "decorators": [
+            {
+              "id": "73ce33f2-3c02-497b-bd9f-f812e3d0ee11",
+              "type": "waitUntil",
+              "name": "Wait Until Path Ready",
+              "condition": [
+                "return loc.lastKnownMinotaurPosition ~= nil"
+              ]
+            }
+          ],
+          "script": [
+            "if loc.lastKnownMinotaurPosition ~= nil then",
+            "    loc.pathQuery = FindPath(self:GetPosition(),loc.lastKnownMinotaurPosition)",
+            "end"
+          ]
+        },
+        {
+          "name": "Fetch path",
+          "id": "af5f64ad-81c3-49c3-b484-2024c6b5bfa1",
+          "type": "scriptAction",
+          "decorators": [
+            {
+              "id": "224f0d20-657a-41d6-a405-6ee09d470ce8",
+              "type": "waitUntil",
+              "name": "Wait Until Path Ready",
+              "condition": [
+                "return loc.pathQuery:IsReady()"
+              ]
+            }
+          ],
+          "script": [
+            "loc.path = loc.pathQuery:Value()",
+            "",
+            "local last_dir = self:GetHeading()",
+            "    for step = 1, loc.path:Length(), 2 do",
+            "        local dir = loc.path:DirectionAlongPath(step)",
+            "        local turn = MathExt.AngleDiff(dir, last_dir)",
+            "        if math.abs(turn) > 30 then",
+            "            local corner = loc.path:PositionAlongPath(step)",
+            "            loc.corners[#loc.corners] = corner",
+            "        end",
+            "        last_dir = dir",
+            "    end"
+          ]
+        },
+        {
+          "name": "DRAW PATH",
+          "id": "5421309e-8dae-488f-af1a-8e32624ab197",
+          "type": "scriptAction",
+          "decorators": [
+            {
+              "id": "f9a2db05-2119-4f28-a1bc-cd100eb7e307",
+              "type": "loopForever",
+              "name": "Draw line"
+            }
+          ],
+          "script": [
+            "if",
+            "    loc.path ~= nil",
+            "then",
+            "    local OFFSET = Vec3(0,0,2)",
+            "    ai_core_public.draw.Path(",
+            "        loc.path,",
+            "        1, 0, 1, 1,",
+            "        OFFSET",
+            "    )",
+            "    for i, corner in ipairs(loc.corners) do",
+            "      ai_core_public.draw.Circle(",
+            "                    corner + OFFSET, 2, 1, 0, 1, 1",
+            "                )",
+            "    end",
+            "    ",
+            "end"
+          ]
+        }
       ]
+    },
+    {
+      "name": "look around",
+      "id": "23bdb5dd-f256-4740-b5dd-20a19e10ed67",
+      "type": "sequence",
+      "subtrees": [
+        {
+          "name": "look for targets",
+          "id": "7b98ac25-5da9-4a32-be1f-9a108541791b",
+          "type": "scriptAction",
+          "script": [
+            "-- infantryman soldier override reaction",
+            "loc.visibleEnemies = self:GetVisibleEnemies()"
+          ]
+        },
+        {
+          "name": "1",
+          "id": "fa355da3-f558-45bf-9d15-2a744c299cb6",
+          "type": "wait",
+          "time": [
+            "return 1"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "reaction",
+      "id": "7a91e1ef-6578-481c-a16d-865012a39228",
+      "type": "selector",
+      "subtrees": [
+        {
+          "name": "fight",
+          "id": "6c22eb52-1c4f-434b-bbc4-4badf881b7ce",
+          "type": "sequence",
+          "subtrees": [
+            {
+              "name": "select target",
+              "id": "c70aadf5-b176-4a50-8be0-d7e256574d9a",
+              "type": "scriptAction",
+              "script": [
+                "loc.target = loc.visibleEnemies[math.random(#loc.visibleEnemies)]"
+              ]
+            },
+            {
+              "name": "Aim",
+              "id": "d310fa5a-e7a8-4785-a414-d9503f23a24d",
+              "type": "scriptAction",
+              "script": [
+                "self:ReqHeadingAimAtEntity(loc.target)"
+              ]
+            },
+            {
+              "name": "Fire",
+              "id": "08261bd6-b472-425f-82ea-10551656743b",
+              "type": "fire",
+              "rounds": [
+                "return math.random(2,4)"
+              ],
+              "forced": false
+            },
+            {
+              "name": "Reload",
+              "id": "dac8940c-1b5a-4fee-bb98-f764d1a26115",
+              "type": "reloadWeapon"
+            }
+          ],
+          "decorators": [
+            {
+              "id": "af9498d2-3d27-43ab-8606-c21bc656c62c",
+              "type": "scriptCondition",
+              "name": "reaction",
+              "script": [
+                "DebugLog('' ..#loc.visibleEnemies)",
+                "if #loc.visibleEnemies > 0 then",
+                "    return true",
+                "else",
+                "    loc.target = nil",
+                "    return false",
+                "end"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "wait for path then move to goal",
+          "id": "109f2370-f39f-40bb-a366-947055d5187f",
+          "type": "sequence",
+          "subtrees": [
+            {
+              "name": "wait until path is not nil",
+              "id": "3005c15a-129d-4c16-9606-3d8cefeb667f",
+              "type": "waitUntil",
+              "condition": [
+                "return loc.path ~= nil"
+              ]
+            },
+            {
+              "name": "Move to goal",
+              "id": "721b1dfc-b0fb-495d-9480-72ef1b712f31",
+              "type": "move",
+              "position": [
+                "return loc.path:PositionAlongPath(loc.path:Length())"
+              ]
+            }
+          ]
+        }
+      ],
+      "active": true
     }
   ],
   "meta": {
     "nodesInfo": [
       {
         "id": "d78bd913-1f1b-42c2-bdb7-f5329855df7a",
-        "position": "1890.5,148.8"
+        "position": "1950,315.104761904762"
       },
       {
         "id": "bb4a3ad6-dba8-4574-8ca3-5ac83fde2c15",
-        "position": "1400,220.1"
-      },
-      {
-        "id": "45871188-ca54-43ec-b8b2-4212d5a0c8f6",
-        "position": "1625,282.6"
-      },
-      {
-        "id": "ba0ba4c1-fce7-4551-b0cc-794e7689cfea",
-        "position": "1287.5,557.6"
-      },
-      {
-        "id": "af5f64ad-81c3-49c3-b484-2024c6b5bfa1",
-        "position": "1462.5,557.6"
-      },
-      {
-        "id": "5421309e-8dae-488f-af1a-8e32624ab197",
-        "position": "1662.5,657.6"
+        "position": "937.5,427.604761904762"
       },
       {
         "id": "ad145cf5-8d38-42b9-a608-fffce5a30a6f",
-        "position": "2092.1,305.6"
+        "position": "1337.5,440.104761904762"
       },
       {
         "id": "3158cec4-ab07-4c7a-84f7-710d01746d6e",
-        "position": "1982.5,403.2"
+        "position": "1150,540.104761904762"
       },
       {
         "id": "39fbf2a7-62c2-4c12-91dd-bc281f9a8246",
-        "position": "2335.3,416.8"
+        "position": "1425,540.104761904762"
       },
       {
         "id": "968ab992-35ff-4c16-8c47-d42467b7d559",
-        "position": "1962.5,520.1"
+        "position": "931.14444444445,644.615873015872"
       },
       {
         "id": "ef7b2928-da1f-413a-8614-478503b616ec",
-        "position": "2518.85555555555,528.088888888889"
+        "position": "1462.5,652.604761904762"
+      },
+      {
+        "id": "45871188-ca54-43ec-b8b2-4212d5a0c8f6",
+        "position": "1762.5,452.604761904764"
+      },
+      {
+        "id": "ba0ba4c1-fce7-4551-b0cc-794e7689cfea",
+        "position": "1575,752.604761904762"
+      },
+      {
+        "id": "af5f64ad-81c3-49c3-b484-2024c6b5bfa1",
+        "position": "1750,752.604761904762"
+      },
+      {
+        "id": "5421309e-8dae-488f-af1a-8e32624ab197",
+        "position": "1937.5,752.604761904762"
+      },
+      {
+        "id": "23bdb5dd-f256-4740-b5dd-20a19e10ed67",
+        "position": "2112.5,465.104761904762"
+      },
+      {
+        "id": "7b98ac25-5da9-4a32-be1f-9a108541791b",
+        "position": "2037.5,565.104761904762"
+      },
+      {
+        "id": "fa355da3-f558-45bf-9d15-2a744c299cb6",
+        "position": "2200,565.104761904762"
+      },
+      {
+        "id": "7a91e1ef-6578-481c-a16d-865012a39228",
+        "position": "2787.5,477.604761904762"
+      },
+      {
+        "id": "6c22eb52-1c4f-434b-bbc4-4badf881b7ce",
+        "position": "2575,640.104761904762"
+      },
+      {
+        "id": "c70aadf5-b176-4a50-8be0-d7e256574d9a",
+        "position": "2250,777.604761904762"
+      },
+      {
+        "id": "d310fa5a-e7a8-4785-a414-d9503f23a24d",
+        "position": "2412.5,777.604761904762"
+      },
+      {
+        "id": "08261bd6-b472-425f-82ea-10551656743b",
+        "position": "2575,777.604761904762"
+      },
+      {
+        "id": "dac8940c-1b5a-4fee-bb98-f764d1a26115",
+        "position": "2750,777.604761904762"
+      },
+      {
+        "id": "109f2370-f39f-40bb-a366-947055d5187f",
+        "position": "3012.5,652.604761904762",
+        "width": 274.97142857142933
+      },
+      {
+        "id": "3005c15a-129d-4c16-9606-3d8cefeb667f",
+        "position": "2950,777.604761904762"
+      },
+      {
+        "id": "721b1dfc-b0fb-495d-9480-72ef1b712f31",
+        "position": "3212.5,777.604761904762"
       }
     ],
     "editorObjects": [],
-    "canvasSize": "3840,2457.6",
-    "gridPadding": "0,7.60000000000011"
+    "canvasSize": "4014.46142857145,2665.10476190477",
+    "gridPadding": "0,2.60476190476218"
   },
   "parameters": [
     {
@@ -248,6 +371,9 @@
   "locals": {
     "lastKnownMinotaurPosition": "return nil",
     "path": "return nil",
-    "pathQuery": "return nil"
+    "pathQuery": "return nil",
+    "corners": "return {}",
+    "visibleEnemies": "return nil",
+    "target": "return nil"
   }
 }
