@@ -72,6 +72,19 @@
             "        1, 0, 1, 1,",
             "        OFFSET",
             "    )",
+            "    ",
+            "    local last_dir = self:GetHeading()",
+            "    for step = 1, loc.path:Length(), 2 do",
+            "        local dir = loc.path:DirectionAlongPath(step)",
+            "        local turn = MathExt.AngleDiff(dir, last_dir)",
+            "        if math.abs(turn) > 30 then",
+            "            ai_core_public.draw.Circle(",
+            "                loc.path:PositionAlongPath(step) + OFFSET, 2, 1, 0, 1, 1",
+            "            )",
+            "        end",
+            "        last_dir = dir",
+            "    end",
+            "    ",
             "end"
           ]
         }
@@ -144,63 +157,85 @@
         "nodesInfo": [
           {
             "id": "50b16405-acbf-4ec5-ae0d-e8be65387270",
-            "position": "1800,295"
+            "position": "1975,695.1"
           }
         ],
         "editorObjects": []
       }
+    },
+    {
+      "name": "<unnamed>",
+      "id": "ec114c31-3640-4fe3-823e-e67cfbdb7da6",
+      "type": "scriptCondition",
+      "meta": {
+        "nodesInfo": [
+          {
+            "id": "ec114c31-3640-4fe3-823e-e67cfbdb7da6",
+            "position": "1837.5,782.6"
+          }
+        ],
+        "editorObjects": []
+      },
+      "script": [
+        "",
+        "DebugLog('loc.path: '..tostring(loc.path))",
+        "DebugLog('pathQuery: '..tostring(loc.pathQuery:Value()))",
+        "if loc.path == loc.pathQuery:Value() then",
+        "\treturn true",
+        "return false"
+      ]
     }
   ],
   "meta": {
     "nodesInfo": [
       {
         "id": "d78bd913-1f1b-42c2-bdb7-f5329855df7a",
-        "position": "1890.5,111.2"
+        "position": "1890.5,148.8"
       },
       {
         "id": "bb4a3ad6-dba8-4574-8ca3-5ac83fde2c15",
-        "position": "1400,182.5"
+        "position": "1400,220.1"
       },
       {
         "id": "45871188-ca54-43ec-b8b2-4212d5a0c8f6",
-        "position": "1625,245"
+        "position": "1625,282.6"
       },
       {
         "id": "ba0ba4c1-fce7-4551-b0cc-794e7689cfea",
-        "position": "1287.5,520"
+        "position": "1287.5,557.6"
       },
       {
         "id": "af5f64ad-81c3-49c3-b484-2024c6b5bfa1",
-        "position": "1462.5,520"
+        "position": "1462.5,557.6"
       },
       {
         "id": "5421309e-8dae-488f-af1a-8e32624ab197",
-        "position": "1687.5,507.5"
+        "position": "1662.5,657.6"
       },
       {
         "id": "ad145cf5-8d38-42b9-a608-fffce5a30a6f",
-        "position": "2092.1,268"
+        "position": "2092.1,305.6"
       },
       {
         "id": "3158cec4-ab07-4c7a-84f7-710d01746d6e",
-        "position": "1982.5,365.6"
+        "position": "1982.5,403.2"
       },
       {
         "id": "39fbf2a7-62c2-4c12-91dd-bc281f9a8246",
-        "position": "2335.3,379.2"
+        "position": "2335.3,416.8"
       },
       {
         "id": "968ab992-35ff-4c16-8c47-d42467b7d559",
-        "position": "1962.5,482.5"
+        "position": "1962.5,520.1"
       },
       {
         "id": "ef7b2928-da1f-413a-8614-478503b616ec",
-        "position": "2518.85555555555,490.488888888889"
+        "position": "2518.85555555555,528.088888888889"
       }
     ],
     "editorObjects": [],
-    "canvasSize": "3840,2420",
-    "gridPadding": "0,7.5"
+    "canvasSize": "3840,2457.6",
+    "gridPadding": "0,7.60000000000011"
   },
   "parameters": [
     {
