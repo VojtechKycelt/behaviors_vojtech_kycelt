@@ -44,3 +44,37 @@ class CfgFunctions
 	}
 	
 };
+
+// Defines the new order as available from the Control AI - Military
+class CfgAvailableBehaviors
+{
+	class behaviors_vojtech_kycelt
+	{		
+		icon = "\vbs2\customer\plugins\behaviors_vojtech_kycelt\data\behaviors_sample.paa";
+		allowRotate = true;
+
+
+		displayname = "DPRK Advance";
+		description = "DPRK Advance";				
+
+		orderName = "Advance";
+		prepareActionMessage = "vbs2\vbs_plugins\ai\standard_behaviors\data\scripts\PrepareBTParameters.sqf";
+		
+		class RootBehaviors
+		{
+		  group[] = {"standard_behaviors", "GroupRoot"};
+		  entity[] = {"standard_behaviors", "EntityRoot"};
+		  vehicle[] = {"standard_behaviors", "VehicleRoot"};
+		};
+		
+		class Parameters
+		{
+			class debugEnabled
+			{
+				displayName = "debugEnabled";
+				value = "true";
+				type = "boolean";
+			};
+		};
+	};
+};

@@ -1,10 +1,12 @@
 {
   "name": "behaviors_vojtech_kycelt",
   "trees": [
+    "SquadOverwatch\\AlternativeRetreat.bt",
     "Theseus\\FindAndEliminate.bt",
     "Theseus\\Listen.bt"
   ],
   "initScripts": [
+    "SquadOverwatch\\DPRKsquad.class.lua",
     "Theseus\\Theseus.class.lua",
     "classes.lua"
   ],

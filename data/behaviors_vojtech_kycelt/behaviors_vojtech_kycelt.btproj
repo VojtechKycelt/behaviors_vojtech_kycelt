@@ -14,6 +14,12 @@
     <Content Include="classes.lua">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="SquadOverwatch\AlternativeRetreat.bt">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="SquadOverwatch\DPRKsquad.class.lua">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Theseus\FindAndEliminate.bt">
       <SubType>Content</SubType>
     </Content>
@@ -25,6 +31,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="SquadOverwatch" />
     <Folder Include="Theseus" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
