@@ -14,13 +14,15 @@
       "type": "sequence",
       "subtrees": [
         {
-          "name": "Update minotaur position",
-          "id": "3158cec4-ab07-4c7a-84f7-710d01746d6e",
-          "type": "messageHandler",
-          "handler": [
-            "if msg.value.position then",
-            "\tloc.lastKnownMinotaurPosition = msg.value.position",
-            "end"
+          "name": "wait for minotaur pos",
+          "id": "ad8308f1-4d6f-4225-9c11-a30daa873437",
+          "type": "waitUntil",
+          "condition": [
+            "if arg.orderData ~= nil and arg.orderData.position ~= nil then",
+            "    loc.lastKnownMinotaurPosition = arg.orderData.position",
+            "    return true",
+            "end",
+            "return false"
           ]
         },
         {
@@ -80,7 +82,25 @@
               "type": "waitUntil",
               "name": "Wait Until Path Ready",
               "condition": [
-                "return loc.lastKnownMinotaurPosition ~= nil"
+                "--If we dont have minotaur pos we cant plan path to nil",
+                "if loc.lastKnownMinotaurPosition == nil then",
+                "    return false",
+                "end",
+                "",
+                "--if this is the first time and we do not have path",
+                "if loc.path == nil then",
+                "    --if loc.pathQuery == nil then",
+                "        return true",
+                "    --elseif not loc.pathQuery:IsReady() then",
+                "        --return false",
+                "    --end",
+                "end",
+                "",
+                "if loc.path:EndPoint() ~= nil and loc.path:EndPoint():Distance(loc.lastKnownMinotaurPosition) > 5 and loc.pathQuery ~= nil and loc.pathQuery:IsReady() then",
+                "    return true",
+                "end",
+                "",
+                "return false"
               ]
             }
           ],
@@ -106,48 +126,48 @@
           ],
           "script": [
             "loc.path = loc.pathQuery:Value()",
-            "",
+            "loc.corners = {}",
             "local last_dir = self:GetHeading()",
-            "    for step = 1, loc.path:Length(), 1 do",
-            "        local dir = loc.path:DirectionAlongPath(step)",
-            "        local turn = MathExt.AngleDiff(dir, last_dir)",
-            "        if math.abs(turn) > 15 then",
-            "            local corner = loc.path:PositionAlongPath(step)",
-            "            loc.corners[#loc.corners + 1] = corner",
-            "        end",
-            "        last_dir = dir",
-            "    end"
-          ]
-        },
-        {
-          "name": "DRAW PATH",
-          "id": "5421309e-8dae-488f-af1a-8e32624ab197",
-          "type": "scriptAction",
-          "decorators": [
-            {
-              "id": "f9a2db05-2119-4f28-a1bc-cd100eb7e307",
-              "type": "loopForever",
-              "name": "Draw line"
-            }
-          ],
-          "script": [
-            "if",
-            "    loc.path ~= nil",
-            "then",
-            "    local OFFSET = Vec3(0,0,2)",
-            "    ai_core_public.draw.Path(",
-            "        loc.path,",
-            "        1, 0, 1, 1,",
-            "        OFFSET",
-            "    )",
-            "    for i, corner in ipairs(loc.corners) do",
-            "      ai_core_public.draw.Circle(",
-            "                    corner + OFFSET, 2, 1, 0, 1, 1",
-            "                )",
+            "for step = 1, loc.path:Length(), 1 do",
+            "    local dir = loc.path:DirectionAlongPath(step)",
+            "    local turn = MathExt.AngleDiff(dir, last_dir)",
+            "    if math.abs(turn) > 15 then",
+            "        local corner = loc.path:PositionAlongPath(step)",
+            "        loc.corners[#loc.corners + 1] = corner",
             "    end",
+            "    last_dir = dir",
             "end"
           ]
         }
+      ]
+    },
+    {
+      "name": "DRAW PATH",
+      "id": "5421309e-8dae-488f-af1a-8e32624ab197",
+      "type": "scriptAction",
+      "decorators": [
+        {
+          "id": "f9a2db05-2119-4f28-a1bc-cd100eb7e307",
+          "type": "loopForever",
+          "name": "Draw line"
+        }
+      ],
+      "script": [
+        "if",
+        "    loc.path ~= nil",
+        "then",
+        "    local OFFSET = Vec3(0,0,2)",
+        "    ai_core_public.draw.Path(",
+        "        loc.path,",
+        "        1, 0, 1, 1,",
+        "        OFFSET",
+        "    )",
+        "    for i, corner in ipairs(loc.corners) do",
+        "      ai_core_public.draw.Circle(",
+        "                    corner + OFFSET, 2, 1, 0, 1, 1",
+        "                )",
+        "    end",
+        "end"
       ]
     },
     {
@@ -384,19 +404,67 @@
                           "type": "sequence",
                           "subtrees": [
                             {
-                              "name": "Move 1m back",
-                              "id": "20d002f3-f005-439b-9991-3840f3ab191a",
-                              "type": "move",
-                              "position": [
-                                "return loc.path:PositionAlongPath(loc.path:Length()-1)"
+                              "name": "turn",
+                              "id": "06cd7afe-c5f0-474a-b533-2904efb9d844",
+                              "type": "scriptAction",
+                              "script": [
+                                "self:ReqHeadingAimAtPos(self:GetPosition()+ Vec3(10,0,0), 1)"
                               ]
                             },
                             {
-                              "name": "Move to goal",
-                              "id": "b05dff17-b6b1-4d55-8434-0c737891f2b8",
-                              "type": "move",
-                              "position": [
-                                "return loc.path:PositionAlongPath(loc.path:Length())"
+                              "name": "wait 0.5 s",
+                              "id": "becce509-6a3a-46fd-a231-5d539b142990",
+                              "type": "wait",
+                              "time": [
+                                "0.5"
+                              ]
+                            },
+                            {
+                              "name": "turn 2",
+                              "id": "91891354-1c39-415b-8737-560827411824",
+                              "type": "scriptAction",
+                              "script": [
+                                "self:ReqHeadingAimAtPos(self:GetPosition()+ Vec3(0,10,0), 1)"
+                              ]
+                            },
+                            {
+                              "name": "wait 0.5 s",
+                              "id": "070925a1-6dd0-47ef-943a-e2eb8a5d1238",
+                              "type": "wait",
+                              "time": [
+                                "0.5"
+                              ]
+                            },
+                            {
+                              "name": "turn",
+                              "id": "7d018fdf-e9ac-4513-9f51-caf19eb10a04",
+                              "type": "scriptAction",
+                              "script": [
+                                "self:ReqHeadingAimAtPos(self:GetPosition()+ Vec3(-10,0,0), 1)"
+                              ]
+                            },
+                            {
+                              "name": "wait 0.5 s",
+                              "id": "d381cb24-3da8-40d3-b122-7d01548bbe0b",
+                              "type": "wait",
+                              "time": [
+                                "0.5"
+                              ]
+                            },
+                            {
+                              "name": "turn 2",
+                              "id": "912ba776-3fe8-4a18-a177-3a1e8876245d",
+                              "type": "scriptAction",
+                              "script": [
+                                "self:ReqHeadingAimAtPos(self:GetPosition()+ Vec3(0,-10,0), 1)"
+                              ]
+                            },
+                            {
+                              "name": "wait 0.5 s",
+                              "id": "356c8886-d736-41fa-b5c5-99dfeeb29232",
+                              "type": "wait",
+                              "time": [
+                                "0.5"
                               ]
                             }
                           ],
@@ -443,7 +511,7 @@
         "nodesInfo": [
           {
             "id": "b245c12e-17b2-4772-a44e-2416a64275cd",
-            "position": "3275,1123.6619047619"
+            "position": "3275,1171.6619047619"
           }
         ],
         "editorObjects": []
@@ -460,173 +528,197 @@
     "nodesInfo": [
       {
         "id": "d78bd913-1f1b-42c2-bdb7-f5329855df7a",
-        "position": "1950,336.161904761904"
+        "position": "1950,384.161904761904"
       },
       {
         "id": "bb4a3ad6-dba8-4574-8ca3-5ac83fde2c15",
-        "position": "937.5,448.661904761904"
+        "position": "937.5,496.661904761904"
       },
       {
         "id": "ad145cf5-8d38-42b9-a608-fffce5a30a6f",
-        "position": "1337.5,461.161904761904"
+        "position": "1337.5,509.161904761904"
       },
       {
-        "id": "3158cec4-ab07-4c7a-84f7-710d01746d6e",
-        "position": "1150,561.161904761904"
+        "id": "ad8308f1-4d6f-4225-9c11-a30daa873437",
+        "position": "1162.5,621.661904761904"
       },
       {
         "id": "39fbf2a7-62c2-4c12-91dd-bc281f9a8246",
-        "position": "1425,561.161904761904"
+        "position": "1425,609.161904761904"
       },
       {
         "id": "968ab992-35ff-4c16-8c47-d42467b7d559",
-        "position": "931.14444444445,665.673015873014"
+        "position": "931.14444444445,713.673015873014"
       },
       {
         "id": "ef7b2928-da1f-413a-8614-478503b616ec",
-        "position": "1462.5,673.661904761904"
+        "position": "1462.5,721.661904761904"
       },
       {
         "id": "45871188-ca54-43ec-b8b2-4212d5a0c8f6",
-        "position": "1762.5,473.661904761906"
+        "position": "1762.5,521.661904761906"
       },
       {
         "id": "ba0ba4c1-fce7-4551-b0cc-794e7689cfea",
-        "position": "1375,848.661904761904"
+        "position": "1375,896.661904761904"
       },
       {
         "id": "af5f64ad-81c3-49c3-b484-2024c6b5bfa1",
-        "position": "1550,848.661904761904"
+        "position": "1550,896.661904761904"
       },
       {
         "id": "5421309e-8dae-488f-af1a-8e32624ab197",
-        "position": "1737.5,848.661904761904"
+        "position": "1962.5,559.161904761904"
       },
       {
         "id": "23bdb5dd-f256-4740-b5dd-20a19e10ed67",
-        "position": "2012.5,473.661904761904"
+        "position": "2200,509.161904761903"
       },
       {
         "id": "7b98ac25-5da9-4a32-be1f-9a108541791b",
-        "position": "1987.5,573.661904761904"
+        "position": "2175,609.161904761904"
       },
       {
         "id": "7a91e1ef-6578-481c-a16d-865012a39228",
-        "position": "2787.5,498.661904761904"
+        "position": "2787.5,546.661904761904"
       },
       {
         "id": "6c22eb52-1c4f-434b-bbc4-4badf881b7ce",
-        "position": "2575,661.161904761904"
+        "position": "2575,709.161904761904"
       },
       {
         "id": "c70aadf5-b176-4a50-8be0-d7e256574d9a",
-        "position": "2250,798.661904761904"
+        "position": "2250,846.661904761904"
       },
       {
         "id": "d310fa5a-e7a8-4785-a414-d9503f23a24d",
-        "position": "2412.5,798.661904761904"
+        "position": "2412.5,846.661904761904"
       },
       {
         "id": "08261bd6-b472-425f-82ea-10551656743b",
-        "position": "2575,798.661904761904"
+        "position": "2575,846.661904761904"
       },
       {
         "id": "dac8940c-1b5a-4fee-bb98-f764d1a26115",
-        "position": "2750,798.661904761904"
+        "position": "2750,846.661904761904"
       },
       {
         "id": "109f2370-f39f-40bb-a366-947055d5187f",
-        "position": "3012.5,673.661904761904",
+        "position": "3012.5,721.661904761904",
         "width": 274.97142857142933
       },
       {
         "id": "3005c15a-129d-4c16-9606-3d8cefeb667f",
-        "position": "2950,798.661904761904"
+        "position": "2950,846.661904761904"
       },
       {
         "id": "542af17a-d57f-44c5-a86e-23b1f4e06794",
-        "position": "3337.5,798.661904761904"
+        "position": "3337.5,846.661904761904"
       },
       {
         "id": "cef82555-fa53-490f-a4b4-cc42d237c9a9",
-        "position": "2800,923.661904761904"
+        "position": "2800,971.661904761904"
       },
       {
         "id": "0fc16da6-e28f-4da2-a57b-5d2612ef1828",
-        "position": "2259.15684119149,1106.8111111111"
+        "position": "2259.15684119149,1154.8111111111"
       },
       {
         "id": "e26aaa72-f027-4e99-ad02-af6c7e1af853",
-        "position": "2162.5,1173.6619047619"
+        "position": "2162.5,1221.6619047619"
       },
       {
         "id": "f175552d-0199-44eb-bdd0-20125fba363a",
-        "position": "2091.64315880852,1242.71269841271"
+        "position": "2091.64315880852,1290.71269841271"
       },
       {
         "id": "a7583720-2e8f-40b1-83b8-a771dfae9448",
-        "position": "2262.5,1248.6619047619"
+        "position": "2262.5,1296.6619047619"
       },
       {
         "id": "807f2597-0c64-4498-91f5-2d3b4c6a26fd",
-        "position": "2425,1173.6619047619"
+        "position": "2425,1221.6619047619"
       },
       {
         "id": "734d6b34-fa91-4aca-af77-75e490a35daf",
-        "position": "2787.5,1111.1619047619"
+        "position": "2787.5,1159.1619047619"
       },
       {
         "id": "e6ca0c2f-d410-474f-9d0c-1231469e4a33",
-        "position": "2690.84315880851,1178.01269841271"
+        "position": "2690.84315880851,1226.01269841271"
       },
       {
         "id": "7fc684fc-4116-4b11-8481-8191d17aa952",
-        "position": "2625,1248.6619047619"
+        "position": "2625,1296.6619047619"
       },
       {
         "id": "9843f13b-a37e-4686-8d55-913b3dddcb5b",
-        "position": "2790.84315880851,1253.01269841271"
+        "position": "2790.84315880851,1301.01269841271"
       },
       {
         "id": "e8e343b6-16fd-4ed4-a572-3cedb8ff7543",
-        "position": "2962.5,1186.1619047619"
+        "position": "2962.5,1234.1619047619"
       },
       {
         "id": "0a7cfb6d-ca23-4cfd-8341-9a761d07d8dd",
-        "position": "3075,1098.6619047619"
+        "position": "3075,1146.6619047619"
       },
       {
         "id": "d0912a5e-2ea5-4ccd-9321-f8f60a739718",
-        "position": "3562.5,886.161904761904"
+        "position": "3562.5,934.161904761904"
       },
       {
         "id": "205929ba-5c77-4d4a-9980-a262ba0c8561",
-        "position": "3486.42746031737,1011.61111111111"
+        "position": "3486.42746031737,1059.61111111111"
       },
       {
         "id": "121aec06-1612-432d-a1b6-96dca75d5d0f",
-        "position": "3712.5,1011.1619047619"
+        "position": "3712.5,1059.1619047619"
       },
       {
         "id": "a2273d1e-b1a5-46db-9476-5a014c85e47d",
-        "position": "3350,1198.6619047619"
+        "position": "3687.5,1246.6619047619"
       },
       {
-        "id": "20d002f3-f005-439b-9991-3840f3ab191a",
-        "position": "3037.5,1386.1619047619"
+        "id": "06cd7afe-c5f0-474a-b533-2904efb9d844",
+        "position": "3050,1459.16190476191"
       },
       {
-        "id": "b05dff17-b6b1-4d55-8434-0c737891f2b8",
-        "position": "3450,1386.1619047619"
+        "id": "becce509-6a3a-46fd-a231-5d539b142990",
+        "position": "3250,1459.16190476191"
+      },
+      {
+        "id": "91891354-1c39-415b-8737-560827411824",
+        "position": "3425,1459.16190476191"
+      },
+      {
+        "id": "070925a1-6dd0-47ef-943a-e2eb8a5d1238",
+        "position": "3625,1459.16190476191"
+      },
+      {
+        "id": "7d018fdf-e9ac-4513-9f51-caf19eb10a04",
+        "position": "3825,1459.16190476191"
+      },
+      {
+        "id": "d381cb24-3da8-40d3-b122-7d01548bbe0b",
+        "position": "4025,1459.16190476191"
+      },
+      {
+        "id": "912ba776-3fe8-4a18-a177-3a1e8876245d",
+        "position": "4200,1459.16190476191"
+      },
+      {
+        "id": "356c8886-d736-41fa-b5c5-99dfeeb29232",
+        "position": "4400,1459.16190476191"
       },
       {
         "id": "721b1dfc-b0fb-495d-9480-72ef1b712f31",
-        "position": "4162.5,1198.6619047619"
+        "position": "4162.5,1246.6619047619"
       }
     ],
     "editorObjects": [],
-    "canvasSize": "5090.10885963867,2686.16190476191",
-    "gridPadding": "0,11.1619047619045"
+    "canvasSize": "5090.10885963867,2734.16190476191",
+    "gridPadding": "0,9.16190476190446"
   },
   "parameters": [
     {

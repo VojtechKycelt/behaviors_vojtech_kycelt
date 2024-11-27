@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # VBSControlEditor Solution File, Format Version 11.00
 Project("{F712A9A3-5D53-4E82-8685-6CD26BEE4F42}") = "behaviors_vojtech_kycelt", "behaviors_vojtech_kycelt.btproj", "{59B20EC6-A96B-407D-83AE-55A6E8D2C851}"
 EndProject
-Project("{F712A9A3-5D53-4E82-8685-6CD26BEE4F42}") = "behaviors_minotaur", "..\..\..\behaviors_minotaur\data\behaviors_minotaur\behaviors_minotaur.btproj", "{40CF00E5-7BB2-44C0-B4D3-79BFE41D2EB2}"
+Project("{F712A9A3-5D53-4E82-8685-6CD26BEE4F42}") = "behaviorTreeProject2", "..\..\..\behaviors_sample\data\behaviors_sample\behaviorTreeProject2.btproj", "{C8ECC85A-4D4D-44A0-91C8-733FED452231}"
+EndProject
+Project("{F712A9A3-5D53-4E82-8685-6CD26BEE4F42}") = "behaviors_dprk_simple", "..\..\..\behaviors_dprk_simple\behaviors_dprk_simple.btproj", "{31EB2B4B-C135-4A66-BE87-F0843FCCB034}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,8 +14,10 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{59B20EC6-A96B-407D-83AE-55A6E8D2C851}.Default|x86.ActiveCfg = Default|x86
 		{59B20EC6-A96B-407D-83AE-55A6E8D2C851}.Default|x86.Build.0 = Default|x86
-		{40CF00E5-7BB2-44C0-B4D3-79BFE41D2EB2}.Default|x86.ActiveCfg = Default|x86
-		{40CF00E5-7BB2-44C0-B4D3-79BFE41D2EB2}.Default|x86.Build.0 = Default|x86
+		{C8ECC85A-4D4D-44A0-91C8-733FED452231}.Default|x86.ActiveCfg = Default|x86
+		{C8ECC85A-4D4D-44A0-91C8-733FED452231}.Default|x86.Build.0 = Default|x86
+		{31EB2B4B-C135-4A66-BE87-F0843FCCB034}.Default|x86.ActiveCfg = Default|x86
+		{31EB2B4B-C135-4A66-BE87-F0843FCCB034}.Default|x86.Build.0 = Default|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

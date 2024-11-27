@@ -30,7 +30,8 @@ return {
         behaviors = {
             Idle = {
                 description = 'Idle',
-                tree = 'Listen',
+                --tree = 'Listen',
+				tree = 'FindAndEliminate',
                 parameters = {},
             },
         },

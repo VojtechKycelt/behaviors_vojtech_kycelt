@@ -1,6 +1,7 @@
 {
   "btsets": [
     "behaviors_vojtech_kycelt.btset",
-    "P:\\vbs2\\customer\\plugins\\behaviors_minotaur\\data\\behaviors_minotaur\\behaviors_minotaur.btset"
+    "P:\\vbs2\\customer\\plugins\\behaviors_dprk_simple\\behaviors_dprk_simple.btset",
+    "P:\\vbs2\\customer\\plugins\\behaviors_sample\\data\\behaviors_sample\\behaviorTreeProject2.btset"
   ]
 }

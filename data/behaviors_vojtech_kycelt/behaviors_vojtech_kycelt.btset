@@ -1,8 +1,8 @@
 {
   "name": "behaviors_vojtech_kycelt",
   "trees": [
-    "Theseus\\Listen.bt",
-    "wait.bt"
+    "Theseus\\FindAndEliminate.bt",
+    "Theseus\\Listen.bt"
   ],
   "initScripts": [
     "Theseus\\Theseus.class.lua",
