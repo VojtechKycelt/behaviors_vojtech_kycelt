@@ -108,12 +108,12 @@
             "loc.path = loc.pathQuery:Value()",
             "",
             "local last_dir = self:GetHeading()",
-            "    for step = 1, loc.path:Length(), 2 do",
+            "    for step = 1, loc.path:Length(), 1 do",
             "        local dir = loc.path:DirectionAlongPath(step)",
             "        local turn = MathExt.AngleDiff(dir, last_dir)",
-            "        if math.abs(turn) > 30 then",
+            "        if math.abs(turn) > 15 then",
             "            local corner = loc.path:PositionAlongPath(step)",
-            "            loc.corners[#loc.corners] = corner",
+            "            loc.corners[#loc.corners + 1] = corner",
             "        end",
             "        last_dir = dir",
             "    end"
@@ -145,7 +145,6 @@
             "                    corner + OFFSET, 2, 1, 0, 1, 1",
             "                )",
             "    end",
-            "    ",
             "end"
           ]
         }
@@ -162,15 +161,10 @@
           "type": "scriptAction",
           "script": [
             "-- infantryman soldier override reaction",
-            "loc.visibleEnemies = self:GetVisibleEnemies()"
-          ]
-        },
-        {
-          "name": "1",
-          "id": "fa355da3-f558-45bf-9d15-2a744c299cb6",
-          "type": "wait",
-          "time": [
-            "return 1"
+            "loc.visibleEnemies = self:GetVisibleEnemies()",
+            "if #loc.visibleEnemies > 0 then",
+            "    DebugLog('I SEE ENEMY')",
+            "end"
           ]
         }
       ]
@@ -206,7 +200,7 @@
               "id": "08261bd6-b472-425f-82ea-10551656743b",
               "type": "fire",
               "rounds": [
-                "return math.random(2,4)"
+                "return 10"
               ],
               "forced": false
             },
@@ -222,7 +216,7 @@
               "type": "scriptCondition",
               "name": "reaction",
               "script": [
-                "DebugLog('' ..#loc.visibleEnemies)",
+                "--DebugLog('' ..#loc.visibleEnemies)",
                 "if #loc.visibleEnemies > 0 then",
                 "    return true",
                 "else",
@@ -247,12 +241,192 @@
               ]
             },
             {
-              "name": "Move to goal",
-              "id": "721b1dfc-b0fb-495d-9480-72ef1b712f31",
-              "type": "move",
-              "position": [
-                "return loc.path:PositionAlongPath(loc.path:Length())"
-              ]
+              "name": "check if we are at corner",
+              "id": "542af17a-d57f-44c5-a86e-23b1f4e06794",
+              "type": "selector",
+              "subtrees": [
+                {
+                  "name": "check corner",
+                  "id": "cef82555-fa53-490f-a4b4-cc42d237c9a9",
+                  "type": "sequence",
+                  "subtrees": [
+                    {
+                      "name": "look and wait",
+                      "id": "0fc16da6-e28f-4da2-a57b-5d2612ef1828",
+                      "type": "supervisedParallel",
+                      "subtrees": [
+                        {
+                          "name": "Wait then cancel the look relative",
+                          "id": "e26aaa72-f027-4e99-ad02-af6c7e1af853",
+                          "type": "sequence",
+                          "subtrees": [
+                            {
+                              "name": "wait 1 s",
+                              "id": "f175552d-0199-44eb-bdd0-20125fba363a",
+                              "type": "wait",
+                              "time": [
+                                "1"
+                              ]
+                            },
+                            {
+                              "name": "Succeed",
+                              "id": "a7583720-2e8f-40b1-83b8-a771dfae9448",
+                              "type": "success"
+                            }
+                          ]
+                        },
+                        {
+                          "name": "look left",
+                          "id": "807f2597-0c64-4498-91f5-2d3b4c6a26fd",
+                          "type": "headLookRelative",
+                          "pitch": [
+                            "0"
+                          ],
+                          "yaw": [
+                            "90"
+                          ],
+                          "roll": [
+                            "0"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "name": "look and wait",
+                      "id": "734d6b34-fa91-4aca-af77-75e490a35daf",
+                      "type": "supervisedParallel",
+                      "subtrees": [
+                        {
+                          "name": "Wait then cancel the look relative",
+                          "id": "e6ca0c2f-d410-474f-9d0c-1231469e4a33",
+                          "type": "sequence",
+                          "subtrees": [
+                            {
+                              "name": "wait 1 s",
+                              "id": "7fc684fc-4116-4b11-8481-8191d17aa952",
+                              "type": "wait",
+                              "time": [
+                                "1"
+                              ]
+                            },
+                            {
+                              "name": "Succeed",
+                              "id": "9843f13b-a37e-4686-8d55-913b3dddcb5b",
+                              "type": "success"
+                            }
+                          ]
+                        },
+                        {
+                          "name": "look right",
+                          "id": "e8e343b6-16fd-4ed4-a572-3cedb8ff7543",
+                          "type": "headLookRelative",
+                          "pitch": [
+                            "0"
+                          ],
+                          "yaw": [
+                            "-90"
+                          ],
+                          "roll": [
+                            "0"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Move to goal",
+                      "id": "0a7cfb6d-ca23-4cfd-8341-9a761d07d8dd",
+                      "type": "move",
+                      "position": [
+                        "return loc.path:PositionAlongPath(loc.path:Length())"
+                      ]
+                    }
+                  ],
+                  "decorators": [
+                    {
+                      "id": "6f3298cb-d96b-4c1a-b9ef-a0209f2d481e",
+                      "type": "scriptCondition",
+                      "name": "Is Theseusus located at corner",
+                      "script": [
+                        "--DebugLog('SCRIPT CONDITION:  ' ..#loc.corners)",
+                        "for i, corner in pairs(loc.corners) do",
+                        "\t",
+                        "    if self:GetPosition():Distance(corner) < 2 then",
+                        "        loc.cornerIndexToRemove = i",
+                        "        return true",
+                        "    end",
+                        "end",
+                        "return false"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "is heading correctly",
+                  "id": "d0912a5e-2ea5-4ccd-9321-f8f60a739718",
+                  "type": "sequence",
+                  "subtrees": [
+                    {
+                      "name": "Set heading",
+                      "id": "205929ba-5c77-4d4a-9980-a262ba0c8561",
+                      "type": "scriptAction",
+                      "script": [
+                        "self:ReqHeadingRelToMove(0)"
+                      ]
+                    },
+                    {
+                      "name": "look for path or follow path",
+                      "id": "121aec06-1612-432d-a1b6-96dca75d5d0f",
+                      "type": "selector",
+                      "subtrees": [
+                        {
+                          "name": "Patrol",
+                          "id": "a2273d1e-b1a5-46db-9476-5a014c85e47d",
+                          "type": "sequence",
+                          "subtrees": [
+                            {
+                              "name": "Move 1m back",
+                              "id": "20d002f3-f005-439b-9991-3840f3ab191a",
+                              "type": "move",
+                              "position": [
+                                "return loc.path:PositionAlongPath(loc.path:Length()-1)"
+                              ]
+                            },
+                            {
+                              "name": "Move to goal",
+                              "id": "b05dff17-b6b1-4d55-8434-0c737891f2b8",
+                              "type": "move",
+                              "position": [
+                                "return loc.path:PositionAlongPath(loc.path:Length())"
+                              ]
+                            }
+                          ],
+                          "decorators": [
+                            {
+                              "id": "09799afd-f07a-4dd7-84bb-e0e3d86ea638",
+                              "type": "scriptCondition",
+                              "name": "arrived",
+                              "script": [
+                                "local dist = self:GetPosition():Distance(loc.path:EndPoint())",
+                                "return dist < 3"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "name": "Move to goal",
+                          "id": "721b1dfc-b0fb-495d-9480-72ef1b712f31",
+                          "type": "move",
+                          "position": [
+                            "return loc.path:PositionAlongPath(loc.path:Length())"
+                          ]
+                        }
+                      ],
+                      "active": true
+                    }
+                  ]
+                }
+              ],
+              "active": true
             }
           ]
         }
@@ -260,105 +434,199 @@
       "active": true
     }
   ],
+  "unlinked-trees": [
+    {
+      "name": "remove visited corner",
+      "id": "b245c12e-17b2-4772-a44e-2416a64275cd",
+      "type": "scriptAction",
+      "meta": {
+        "nodesInfo": [
+          {
+            "id": "b245c12e-17b2-4772-a44e-2416a64275cd",
+            "position": "3275,1123.6619047619"
+          }
+        ],
+        "editorObjects": []
+      },
+      "script": [
+        "if loc.cornerIndexToRemove ~= nil then",
+        "    loc.corners[loc.cornerIndexToRemove] = nil",
+        "    loc.cornerIndexToRemove = nil",
+        "end"
+      ]
+    }
+  ],
   "meta": {
     "nodesInfo": [
       {
         "id": "d78bd913-1f1b-42c2-bdb7-f5329855df7a",
-        "position": "1950,315.104761904762"
+        "position": "1950,336.161904761904"
       },
       {
         "id": "bb4a3ad6-dba8-4574-8ca3-5ac83fde2c15",
-        "position": "937.5,427.604761904762"
+        "position": "937.5,448.661904761904"
       },
       {
         "id": "ad145cf5-8d38-42b9-a608-fffce5a30a6f",
-        "position": "1337.5,440.104761904762"
+        "position": "1337.5,461.161904761904"
       },
       {
         "id": "3158cec4-ab07-4c7a-84f7-710d01746d6e",
-        "position": "1150,540.104761904762"
+        "position": "1150,561.161904761904"
       },
       {
         "id": "39fbf2a7-62c2-4c12-91dd-bc281f9a8246",
-        "position": "1425,540.104761904762"
+        "position": "1425,561.161904761904"
       },
       {
         "id": "968ab992-35ff-4c16-8c47-d42467b7d559",
-        "position": "931.14444444445,644.615873015872"
+        "position": "931.14444444445,665.673015873014"
       },
       {
         "id": "ef7b2928-da1f-413a-8614-478503b616ec",
-        "position": "1462.5,652.604761904762"
+        "position": "1462.5,673.661904761904"
       },
       {
         "id": "45871188-ca54-43ec-b8b2-4212d5a0c8f6",
-        "position": "1762.5,452.604761904764"
+        "position": "1762.5,473.661904761906"
       },
       {
         "id": "ba0ba4c1-fce7-4551-b0cc-794e7689cfea",
-        "position": "1575,752.604761904762"
+        "position": "1375,848.661904761904"
       },
       {
         "id": "af5f64ad-81c3-49c3-b484-2024c6b5bfa1",
-        "position": "1750,752.604761904762"
+        "position": "1550,848.661904761904"
       },
       {
         "id": "5421309e-8dae-488f-af1a-8e32624ab197",
-        "position": "1937.5,752.604761904762"
+        "position": "1737.5,848.661904761904"
       },
       {
         "id": "23bdb5dd-f256-4740-b5dd-20a19e10ed67",
-        "position": "2112.5,465.104761904762"
+        "position": "2012.5,473.661904761904"
       },
       {
         "id": "7b98ac25-5da9-4a32-be1f-9a108541791b",
-        "position": "2037.5,565.104761904762"
-      },
-      {
-        "id": "fa355da3-f558-45bf-9d15-2a744c299cb6",
-        "position": "2200,565.104761904762"
+        "position": "1987.5,573.661904761904"
       },
       {
         "id": "7a91e1ef-6578-481c-a16d-865012a39228",
-        "position": "2787.5,477.604761904762"
+        "position": "2787.5,498.661904761904"
       },
       {
         "id": "6c22eb52-1c4f-434b-bbc4-4badf881b7ce",
-        "position": "2575,640.104761904762"
+        "position": "2575,661.161904761904"
       },
       {
         "id": "c70aadf5-b176-4a50-8be0-d7e256574d9a",
-        "position": "2250,777.604761904762"
+        "position": "2250,798.661904761904"
       },
       {
         "id": "d310fa5a-e7a8-4785-a414-d9503f23a24d",
-        "position": "2412.5,777.604761904762"
+        "position": "2412.5,798.661904761904"
       },
       {
         "id": "08261bd6-b472-425f-82ea-10551656743b",
-        "position": "2575,777.604761904762"
+        "position": "2575,798.661904761904"
       },
       {
         "id": "dac8940c-1b5a-4fee-bb98-f764d1a26115",
-        "position": "2750,777.604761904762"
+        "position": "2750,798.661904761904"
       },
       {
         "id": "109f2370-f39f-40bb-a366-947055d5187f",
-        "position": "3012.5,652.604761904762",
+        "position": "3012.5,673.661904761904",
         "width": 274.97142857142933
       },
       {
         "id": "3005c15a-129d-4c16-9606-3d8cefeb667f",
-        "position": "2950,777.604761904762"
+        "position": "2950,798.661904761904"
+      },
+      {
+        "id": "542af17a-d57f-44c5-a86e-23b1f4e06794",
+        "position": "3337.5,798.661904761904"
+      },
+      {
+        "id": "cef82555-fa53-490f-a4b4-cc42d237c9a9",
+        "position": "2800,923.661904761904"
+      },
+      {
+        "id": "0fc16da6-e28f-4da2-a57b-5d2612ef1828",
+        "position": "2259.15684119149,1106.8111111111"
+      },
+      {
+        "id": "e26aaa72-f027-4e99-ad02-af6c7e1af853",
+        "position": "2162.5,1173.6619047619"
+      },
+      {
+        "id": "f175552d-0199-44eb-bdd0-20125fba363a",
+        "position": "2091.64315880852,1242.71269841271"
+      },
+      {
+        "id": "a7583720-2e8f-40b1-83b8-a771dfae9448",
+        "position": "2262.5,1248.6619047619"
+      },
+      {
+        "id": "807f2597-0c64-4498-91f5-2d3b4c6a26fd",
+        "position": "2425,1173.6619047619"
+      },
+      {
+        "id": "734d6b34-fa91-4aca-af77-75e490a35daf",
+        "position": "2787.5,1111.1619047619"
+      },
+      {
+        "id": "e6ca0c2f-d410-474f-9d0c-1231469e4a33",
+        "position": "2690.84315880851,1178.01269841271"
+      },
+      {
+        "id": "7fc684fc-4116-4b11-8481-8191d17aa952",
+        "position": "2625,1248.6619047619"
+      },
+      {
+        "id": "9843f13b-a37e-4686-8d55-913b3dddcb5b",
+        "position": "2790.84315880851,1253.01269841271"
+      },
+      {
+        "id": "e8e343b6-16fd-4ed4-a572-3cedb8ff7543",
+        "position": "2962.5,1186.1619047619"
+      },
+      {
+        "id": "0a7cfb6d-ca23-4cfd-8341-9a761d07d8dd",
+        "position": "3075,1098.6619047619"
+      },
+      {
+        "id": "d0912a5e-2ea5-4ccd-9321-f8f60a739718",
+        "position": "3562.5,886.161904761904"
+      },
+      {
+        "id": "205929ba-5c77-4d4a-9980-a262ba0c8561",
+        "position": "3486.42746031737,1011.61111111111"
+      },
+      {
+        "id": "121aec06-1612-432d-a1b6-96dca75d5d0f",
+        "position": "3712.5,1011.1619047619"
+      },
+      {
+        "id": "a2273d1e-b1a5-46db-9476-5a014c85e47d",
+        "position": "3350,1198.6619047619"
+      },
+      {
+        "id": "20d002f3-f005-439b-9991-3840f3ab191a",
+        "position": "3037.5,1386.1619047619"
+      },
+      {
+        "id": "b05dff17-b6b1-4d55-8434-0c737891f2b8",
+        "position": "3450,1386.1619047619"
       },
       {
         "id": "721b1dfc-b0fb-495d-9480-72ef1b712f31",
-        "position": "3212.5,777.604761904762"
+        "position": "4162.5,1198.6619047619"
       }
     ],
     "editorObjects": [],
-    "canvasSize": "4014.46142857145,2665.10476190477",
-    "gridPadding": "0,2.60476190476218"
+    "canvasSize": "5090.10885963867,2686.16190476191",
+    "gridPadding": "0,11.1619047619045"
   },
   "parameters": [
     {
@@ -374,6 +642,7 @@
     "pathQuery": "return nil",
     "corners": "return {}",
     "visibleEnemies": "return nil",
-    "target": "return nil"
+    "target": "return nil",
+    "cornerIndexToRemove": "return nil"
   }
 }
