@@ -1,17 +1,74 @@
 {
-  "name": "Wait Forever",
-  "id": "21d371f9-5e88-4799-a9f5-86183aae27c3",
-  "type": "waitForever",
+  "name": "<unnamed>",
+  "id": "9d340382-1648-4323-be7d-a539be304d1f",
+  "type": "supervisedParallel",
+  "subtrees": [
+    {
+      "name": "Wait Forever",
+      "id": "21d371f9-5e88-4799-a9f5-86183aae27c3",
+      "type": "waitForever"
+    },
+    {
+      "name": "DRAW PATH",
+      "id": "e4568532-a4f6-4f0e-bca6-f77e38804d1c",
+      "type": "scriptAction",
+      "decorators": [
+        {
+          "id": "19d4aa36-3b47-47d4-8b29-33054740c4ce",
+          "type": "loopForever",
+          "name": "Draw line"
+        }
+      ],
+      "script": [
+        "local params = arg.orderData",
+        "local childEntityPos1 = self:GetChildGroup(0):GetEntity(0):GetPosition()",
+        "local childEntityPos2 = self:GetChildGroup(0):GetEntity(1):GetPosition()",
+        "",
+        "if ",
+        "\tchildEntityPos1 ~= nil and ",
+        "\tchildEntityPos2 ~= nil and",
+        "\tparams ~= nil and",
+        "\tparams.destination ~= nil",
+        "then",
+        "    local OFFSET = Vec3(0,0,2)",
+        "    ai_core_public.draw.Line(",
+        "        childEntityPos1 + OFFSET,",
+        "        params.destination + OFFSET,",
+        "        1, 0, 1, 1",
+        "    )",
+        "    ai_core_public.draw.Line(",
+        "        childEntityPos2 + OFFSET,",
+        "        params.destination + OFFSET,",
+        "        1, 1, 0, 1",
+        "    )",
+        "end"
+      ]
+    }
+  ],
   "meta": {
     "nodesInfo": [
       {
+        "id": "9d340382-1648-4323-be7d-a539be304d1f",
+        "position": "1700,179.2"
+      },
+      {
         "id": "21d371f9-5e88-4799-a9f5-86183aae27c3",
-        "position": "1764,167.2"
+        "position": "1575,354.2"
+      },
+      {
+        "id": "e4568532-a4f6-4f0e-bca6-f77e38804d1c",
+        "position": "1837.5,354.2"
       }
     ],
     "editorObjects": [],
-    "canvasSize": "3840,2400"
+    "canvasSize": "3840,2479.20000000001",
+    "gridPadding": "0,4.19999999999993"
   },
-  "parameters": [],
+  "parameters": [
+    {
+      "name": "orderData",
+      "isOptional": false
+    }
+  ],
   "locals": {}
 }
