@@ -1,74 +1,208 @@
 {
-  "name": "<unnamed>",
+  "name": "Alternative Retreat Tree Root",
   "id": "9d340382-1648-4323-be7d-a539be304d1f",
   "type": "supervisedParallel",
   "subtrees": [
     {
-      "name": "Wait Forever",
-      "id": "21d371f9-5e88-4799-a9f5-86183aae27c3",
-      "type": "waitForever"
-    },
-    {
-      "name": "DRAW PATH",
+      "name": "Draw lines from leaders to waypoint",
       "id": "e4568532-a4f6-4f0e-bca6-f77e38804d1c",
       "type": "scriptAction",
       "decorators": [
         {
           "id": "19d4aa36-3b47-47d4-8b29-33054740c4ce",
           "type": "loopForever",
-          "name": "Draw line"
+          "name": "Draw every frame"
         }
       ],
       "script": [
         "local params = arg.orderData",
-        "local childEntityPos1 = self:GetChildGroup(0):GetEntity(0):GetPosition()",
-        "local childEntityPos2 = self:GetChildGroup(0):GetEntity(1):GetPosition()",
+        "local fireTeamsCount = self:GetChildGroupCount()",
         "",
-        "if ",
-        "\tchildEntityPos1 ~= nil and ",
-        "\tchildEntityPos2 ~= nil and",
-        "\tparams ~= nil and",
-        "\tparams.destination ~= nil",
-        "then",
-        "    local OFFSET = Vec3(0,0,2)",
-        "    ai_core_public.draw.Line(",
-        "        childEntityPos1 + OFFSET,",
-        "        params.destination + OFFSET,",
-        "        1, 0, 1, 1",
-        "    )",
-        "    ai_core_public.draw.Line(",
-        "        childEntityPos2 + OFFSET,",
-        "        params.destination + OFFSET,",
-        "        1, 1, 0, 1",
-        "    )",
+        "for i=0,fireTeamsCount-1 do",
+        "    local fireTeam = self:GetChildGroup(i)",
+        "    local leader = fireTeam:GetLeader()",
+        "",
+        "    if not leader:IsAlive() then",
+        "        local soldiersCount = fireTeam:GetEntityCount()",
+        "",
+        "        for s=0, soldiersCount-1 do",
+        "            local soldier = fireTeam:GetEntity(s)",
+        "",
+        "            if soldier:IsAlive() then",
+        "                leader = soldier ",
+        "            end",
+        "        end",
+        "    end",
+        "    local OFFSET = Vec3(0,0,3)",
+        "    if leader:IsAlive() then",
+        "        ai_core_public.draw.Line(",
+        "            leader:GetPosition() + OFFSET,",
+        "            params.destination + OFFSET,",
+        "            1, 1, 0, 1",
+        "        )",
+        "    end",
         "end"
       ]
+    },
+    {
+      "name": "Is firesquad at destination or move there",
+      "id": "78dac5d9-35ab-4a2f-aa1d-e4f0b8e43b55",
+      "type": "selector",
+      "subtrees": [
+        {
+          "name": "Succeed",
+          "id": "4b945e70-c600-472d-88a8-b94f3d170999",
+          "type": "success",
+          "decorators": [
+            {
+              "id": "64f7690d-ffde-4122-9729-186938f2a93f",
+              "type": "scriptCondition",
+              "name": "FireSquad at target location?",
+              "script": [
+                "local fireTeamsCount = self:GetChildGroupCount()",
+                "for i=0,fireTeamsCount-1 do",
+                "    local fireTeam = self:GetChildGroup(i)",
+                "    local soldiersCount = fireTeam:GetEntityCount()",
+                "    for s=0, soldiersCount-1 do",
+                "        local soldier = fireTeam:GetEntity(s)",
+                "        if soldier:IsAlive() and soldier:GetPosition():Distance(arg.orderData.destination) > 50 then",
+                "            return false ",
+                "        end",
+                "    end",
+                "end",
+                "",
+                "return true"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "prepare and send order",
+          "id": "b31b5a7d-2689-4451-b0b7-9128048fb3aa",
+          "type": "sequence",
+          "subtrees": [
+            {
+              "name": "wait until fireteam leader ready",
+              "id": "f2c7a05b-069c-4897-89a8-f838152304dc",
+              "type": "waitUntil",
+              "condition": [
+                "--local childEntityPos1 = self:GetChildGroup(0):GetEntity(0):GetPosition()",
+                "",
+                "",
+                "",
+                "loc.fireTeamLeader = nil",
+                "local fireTeamCount = self:GetChildGroupCount()",
+                "for i=0,fireTeamCount do    ",
+                "    local group = self:GetChildGroup(i)",
+                "",
+                "    local teamLeader = group:GetLeader()",
+                "    if teamLeader:IsAlive() then",
+                "       loc.fireTeamLeader = teamLeader",
+                "       break ",
+                "    end",
+                "",
+                "    local soldiersCount = group:GetEntityCount()",
+                "    for s=0,soldiersCount do",
+                "        local soldier = group:GetEntity(i)",
+                "        if soldier:IsAlive() then",
+                "            loc.fireTeamLeader = soldier",
+                "            break ",
+                "        end",
+                "    end",
+                "end",
+                "",
+                "return loc.fireTeamLeader ~= nil"
+              ]
+            },
+            {
+              "name": "prepare order data",
+              "id": "a49e9721-012c-4a05-94e9-ae0e9f19f43f",
+              "type": "scriptAction",
+              "script": [
+                "local position = arg.orderData.destination",
+                "loc.subOrderData = {orderName = \"Advance\", destination = position}",
+                "loc.subordinates = {}",
+                "loc.subordinateData = InternalTable()",
+                "for child in self:GetChildGroups() do",
+                "    local subordinate = standard_behaviors.GetVehicleOrSelf(child)",
+                "    table.insert(loc.subordinates, subordinate)    ",
+                "    loc.subordinateData[subordinate] = {",
+                "        destination = position",
+                "    }",
+                "end"
+              ]
+            },
+            {
+              "name": "Clear area for all subordinates",
+              "id": "f10380f0-d393-46d2-80b5-0248edec9c8c",
+              "type": "reference",
+              "target": [
+                "standard_behaviors",
+                "ExecuteSubordinateOrder"
+              ],
+              "arguments": {
+                "orderData": "return loc.subOrderData",
+                "subordinates": "return loc.subordinates",
+                "subordinateData": "return loc.subordinateData",
+                "update": "return false"
+              }
+            }
+          ]
+        }
+      ],
+      "active": true
     }
   ],
   "meta": {
     "nodesInfo": [
       {
         "id": "9d340382-1648-4323-be7d-a539be304d1f",
-        "position": "1700,179.2"
-      },
-      {
-        "id": "21d371f9-5e88-4799-a9f5-86183aae27c3",
-        "position": "1575,354.2"
+        "position": "1700,200.466666666667"
       },
       {
         "id": "e4568532-a4f6-4f0e-bca6-f77e38804d1c",
-        "position": "1837.5,354.2"
+        "position": "1425,312.966666666667"
+      },
+      {
+        "id": "78dac5d9-35ab-4a2f-aa1d-e4f0b8e43b55",
+        "position": "1912.5,312.966666666667"
+      },
+      {
+        "id": "4b945e70-c600-472d-88a8-b94f3d170999",
+        "position": "1700,475.466666666667"
+      },
+      {
+        "id": "b31b5a7d-2689-4451-b0b7-9128048fb3aa",
+        "position": "2200,475.466666666667"
+      },
+      {
+        "id": "f2c7a05b-069c-4897-89a8-f838152304dc",
+        "position": "1962.5,625.466666666667"
+      },
+      {
+        "id": "a49e9721-012c-4a05-94e9-ae0e9f19f43f",
+        "position": "2225,625.466666666667"
+      },
+      {
+        "id": "f10380f0-d393-46d2-80b5-0248edec9c8c",
+        "position": "2400,625.466666666667"
       }
     ],
     "editorObjects": [],
-    "canvasSize": "3840,2479.20000000001",
-    "gridPadding": "0,4.19999999999993"
+    "canvasSize": "3840,2500.46666666667",
+    "gridPadding": "0,0.466666666666697"
   },
   "parameters": [
     {
       "name": "orderData",
-      "isOptional": false
+      "isOptional": false,
+      "defaultValue": ""
     }
   ],
-  "locals": {}
+  "locals": {
+    "fireTeamLeader": "return nil",
+    "subOrderData": "return nil",
+    "subordinateData": "return nil",
+    "subordinates": "return nil"
+  }
 }

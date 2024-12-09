@@ -1,9 +1,5 @@
 {
   "btsets": [
-    "behaviors_vojtech_kycelt.btset",
-    "O:\\behaviourTrees\\behaviorTreeProject2\\behaviorTreeProject2\\behaviorTreeProject2.btset",
-    "P:\\vbs2\\customer\\plugins\\ai_core_public\\data\\ai_core_public\\ai_core_public.btset",
-    "P:\\vbs2\\customer\\plugins\\behaviors_clear_area\\data\\behaviors_clear_area\\behaviors_clear_area.btset",
-    "P:\\vbs2\\customer\\plugins\\behaviors_dprk_simple\\behaviors_dprk_simple.btset"
+    "behaviors_vojtech_kycelt.btset"
   ]
 }
