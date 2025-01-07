@@ -1,5 +1,7 @@
 {
   "btsets": [
-    "behaviors_vojtech_kycelt.btset"
+    "behaviors_vojtech_kycelt.btset",
+    "P:\\vbs2\\customer\\plugins\\ai_core_public\\data\\ai_core_public\\ai_core_public.btset",
+    "P:\\vbs2\\customer\\plugins\\behaviors_vladimir_horky\\data\\behaviors_vladimir_horky\\behaviors_vladimir_horky.btset"
   ]
 }

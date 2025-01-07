@@ -124,16 +124,20 @@
                         "    --set proper waypoint for them",
                         "    if loc.nextWaypointIndex < #loc.waypoints then",
                         "       loc.nextWaypointIndex = loc.nextWaypointIndex+1 ",
-                        "        --loc.waypoints[loc.nextWaypointIndex+1]",
                         "    end",
                         "end",
                         "",
                         "local fireTeam = loc.runningFireTeam",
                         "local soldiersCount = fireTeam:GetEntityCount()",
                         "local nextWaypointPosition = loc.waypoints[loc.nextWaypointIndex]",
+                        "",
+                        "--local headingToPrevWaypoint = loc.path:DirectionAlongPath(loc.nextWaypointIndex) - 180",
+                        "",
+                        "",
                         "for s=0, soldiersCount-1 do",
                         "    local soldier = fireTeam:GetEntity(s)",
                         "    local distance = soldier:GetPosition():Distance(nextWaypointPosition)",
+                        "    --local heading = soldier:GetHeading()",
                         "    if soldier:IsAlive() and distance > 25 then",
                         "        --DebugLog(\"soldier distance: \" ..tostring(distance))",
                         "        return false ",
@@ -175,6 +179,7 @@
                         "    heading = headingToPrevWaypoint",
                         "}",
                         "",
+                        "--DebugLog(\"correct heading: \" ..tostring(headingToPrevWaypoint))",
                         "",
                         "",
                         "",
@@ -319,34 +324,76 @@
       ]
     },
     {
-      "name": "DRAW PATH",
-      "id": "c551c11a-ebc5-45e9-9015-97afda312015",
-      "type": "scriptAction",
-      "decorators": [
+      "name": "<unnamed>",
+      "id": "523af7e9-059d-49b9-a5a7-9852c622ebb8",
+      "type": "selector",
+      "subtrees": [
         {
-          "id": "b6cc4e7e-c186-4994-af17-4393922754d6",
-          "type": "loopForever",
-          "name": "Draw line"
+          "name": "<unnamed>",
+          "id": "a75484b2-890e-4153-8a52-19fa59332d68",
+          "type": "parallel",
+          "subtrees": [
+            {
+              "name": "DRAW PATH",
+              "id": "c551c11a-ebc5-45e9-9015-97afda312015",
+              "type": "scriptAction",
+              "decorators": [
+                {
+                  "id": "b6cc4e7e-c186-4994-af17-4393922754d6",
+                  "type": "loopForever",
+                  "name": "Draw line"
+                }
+              ],
+              "script": [
+                "if",
+                "    loc.path ~= nil",
+                "then",
+                "    local OFFSET = Vec3(0,0,2)",
+                "    ai_core_public.draw.Path(",
+                "        loc.path,",
+                "        1, 0, 1, 1,",
+                "        OFFSET",
+                "    )",
+                "    for i, waypoint in ipairs(loc.waypoints) do",
+                "        --[\"Circle\"] = function(center, radius, r, g, b, a)",
+                "        local color = Vec3(1,0,1)",
+                "        if loc.nextWaypointIndex == i then",
+                "            color = Vec3(0,0,1)",
+                "        end",
+                "        ",
+                "        ai_core_public.draw.Circle(",
+                "            waypoint + OFFSET, ",
+                "            2, ",
+                "            color:X(), color:Y(), color:Z(), ",
+                "            1",
+                "        )",
+                "    end",
+                "end"
+              ]
+            }
+          ],
+          "decorators": [
+            {
+              "id": "4f3b0ad0-04fb-4bab-8fc3-723529996bd4",
+              "type": "scriptCondition",
+              "name": "Debug enabled ?",
+              "script": [
+                "return arg.orderData.debugEnabled"
+              ]
+            }
+          ],
+          "waitForAll": false
+        },
+        {
+          "name": "Wait Forever",
+          "id": "121ae642-2a80-42e4-bb1b-ea15f10e5ca8",
+          "type": "waitForever"
         }
       ],
-      "script": [
-        "if",
-        "    loc.path ~= nil",
-        "then",
-        "    local OFFSET = Vec3(0,0,2)",
-        "    ai_core_public.draw.Path(",
-        "        loc.path,",
-        "        1, 0, 1, 1,",
-        "        OFFSET",
-        "    )",
-        "    for i, waypoint in ipairs(loc.waypoints) do",
-        "      ai_core_public.draw.Circle(",
-        "                    waypoint + OFFSET, 2, 1, 0, 1, 1",
-        "                )",
-        "    end",
-        "end"
-      ]
-    },
+      "active": true
+    }
+  ],
+  "unlinked-trees": [
     {
       "name": "Draw lines from leaders to waypoint",
       "id": "e4568532-a4f6-4f0e-bca6-f77e38804d1c",
@@ -358,6 +405,15 @@
           "name": "Draw every frame"
         }
       ],
+      "meta": {
+        "nodesInfo": [
+          {
+            "id": "e4568532-a4f6-4f0e-bca6-f77e38804d1c",
+            "position": "2950,658.681714285714"
+          }
+        ],
+        "editorObjects": []
+      },
       "script": [
         "local params = arg.orderData",
         "local fireTeamsCount = self:GetChildGroupCount()",
@@ -390,111 +446,6 @@
       ]
     }
   ],
-  "unlinked-trees": [
-    {
-      "name": "prepare and send order",
-      "id": "1c451e2b-9b45-41da-9ddf-9cd386f8579c",
-      "type": "sequence",
-      "subtrees": [
-        {
-          "name": "wait until fireteam leader ready",
-          "id": "1ce8cd4c-9016-4871-b936-567f89f8d974",
-          "type": "waitUntil",
-          "condition": [
-            "--local childEntityPos1 = self:GetChildGroup(0):GetEntity(0):GetPosition()",
-            "",
-            "",
-            "",
-            "loc.fireTeamLeader = nil",
-            "local fireTeamCount = self:GetChildGroupCount()",
-            "for i=0,fireTeamCount do    ",
-            "    local group = self:GetChildGroup(i)",
-            "",
-            "    local teamLeader = group:GetLeader()",
-            "    if teamLeader:IsAlive() then",
-            "       loc.fireTeamLeader = teamLeader",
-            "       break ",
-            "    end",
-            "",
-            "    local soldiersCount = group:GetEntityCount()",
-            "    for s=0,soldiersCount do",
-            "        local soldier = group:GetEntity(i)",
-            "        if soldier:IsAlive() then",
-            "            loc.fireTeamLeader = soldier",
-            "            break ",
-            "        end",
-            "    end",
-            "end",
-            "",
-            "return loc.fireTeamLeader ~= nil"
-          ]
-        },
-        {
-          "name": "prepare order data",
-          "id": "d3fc62d5-9065-4998-bcd1-03fd35d2bd1d",
-          "type": "scriptAction",
-          "script": [
-            "local position = arg.orderData.destination",
-            "loc.subOrderData = {orderName = \"Advance\", destination = position}",
-            "loc.subordinates = {}",
-            "loc.subordinateData = InternalTable()",
-            "",
-            "local child0 = self:GetChildGroup(0)",
-            "local subordinate = standard_behaviors.GetVehicleOrSelf(child0)",
-            "table.insert(loc.subordinates, subordinate)    ",
-            "loc.subordinateData[subordinate] = {",
-            "    destination = position",
-            "}",
-            "",
-            "",
-            "--for child in self:GetChildGroups() do",
-            "    --local subordinate = standard_behaviors.GetVehicleOrSelf(child)",
-            "    --table.insert(loc.subordinates, subordinate)    ",
-            "    --loc.subordinateData[subordinate] = {",
-            "       -- destination = position",
-            "    --}",
-            "--end"
-          ]
-        },
-        {
-          "name": "Clear area for all subordinates",
-          "id": "cb166dd0-7aac-4d77-a1f8-c713bb7bc59a",
-          "type": "reference",
-          "target": [
-            "standard_behaviors",
-            "ExecuteSubordinateOrder"
-          ],
-          "arguments": {
-            "orderData": "return loc.subOrderData",
-            "subordinates": "return loc.subordinates",
-            "subordinateData": "return loc.subordinateData",
-            "update": "return false"
-          }
-        }
-      ],
-      "meta": {
-        "nodesInfo": [
-          {
-            "id": "1c451e2b-9b45-41da-9ddf-9cd386f8579c",
-            "position": "1250,1071.18171428571"
-          },
-          {
-            "id": "1ce8cd4c-9016-4871-b936-567f89f8d974",
-            "position": "1000,1321.18171428571"
-          },
-          {
-            "id": "d3fc62d5-9065-4998-bcd1-03fd35d2bd1d",
-            "position": "1262.5,1321.18171428571"
-          },
-          {
-            "id": "cb166dd0-7aac-4d77-a1f8-c713bb7bc59a",
-            "position": "1437.5,1321.18171428571"
-          }
-        ],
-        "editorObjects": []
-      }
-    }
-  ],
   "meta": {
     "nodesInfo": [
       {
@@ -503,79 +454,87 @@
       },
       {
         "id": "17919634-1abc-425d-9b4b-41427e99df08",
-        "position": "1787.5,321.181714285714"
+        "position": "1575,321.181714285714"
       },
       {
         "id": "f2cb2817-59ef-4332-8bee-a6b6f26a2064",
-        "position": "1712.5,396.181714285714"
+        "position": "1350,408.681714285714"
       },
       {
         "id": "78dac5d9-35ab-4a2f-aa1d-e4f0b8e43b55",
-        "position": "1900,396.181714285714"
+        "position": "1562.5,408.681714285714"
       },
       {
         "id": "22caf228-ca67-4065-af70-79ca73fc7a8b",
-        "position": "1325,483.681714285714"
+        "position": "1175,496.181714285714"
       },
       {
         "id": "38f9ded0-9e3d-4de3-990a-2e7827c4c185",
-        "position": "1225,621.181714285714"
+        "position": "1050,621.181714285714"
       },
       {
         "id": "4b945e70-c600-472d-88a8-b94f3d170999",
-        "position": "1487.5,621.181714285714"
+        "position": "1337.5,621.181714285714"
       },
       {
         "id": "32b07214-bd3e-44cf-b0da-57e86d819211",
-        "position": "1975,508.681714285714"
+        "position": "1650,496.181714285714"
       },
       {
         "id": "4e4d5d27-987f-43b4-b922-caaa32b5525f",
-        "position": "1650,696.181714285714"
+        "position": "1075,746.181714285714"
       },
       {
         "id": "ba3ba65b-5414-4fbe-9735-c22289006e93",
-        "position": "1525,871.181714285714"
+        "position": "925,883.681714285714"
       },
       {
         "id": "5226f611-6463-4024-9cec-5d3ee071c030",
-        "position": "1850,871.181714285714"
+        "position": "1200,883.681714285714"
       },
       {
         "id": "b31b5a7d-2689-4451-b0b7-9128048fb3aa",
-        "position": "2250,708.681714285714"
+        "position": "1700,746.181714285714"
       },
       {
         "id": "a49e9721-012c-4a05-94e9-ae0e9f19f43f",
-        "position": "2175,796.181714285714"
+        "position": "1587.5,883.681714285714"
       },
       {
         "id": "f10380f0-d393-46d2-80b5-0248edec9c8c",
-        "position": "2387.5,783.681714285714"
+        "position": "1775,883.681714285714"
       },
       {
         "id": "aad9363e-f73e-4634-9294-ad91860e24c8",
-        "position": "2500,358.681714285714"
+        "position": "2100,446.181714285714"
       },
       {
         "id": "f2c7a05b-069c-4897-89a8-f838152304dc",
-        "position": "2237.5,446.181714285714"
+        "position": "1937.5,558.681714285714"
       },
       {
         "id": "2b57e4fd-62d7-4ef0-b004-3134987e18d8",
-        "position": "2400,521.181714285714"
+        "position": "2200,558.681714285714"
       },
       {
         "id": "ac6ff361-ff92-4e5c-868c-36fb167c41b2",
-        "position": "2587.5,521.181714285714"
+        "position": "2412.5,558.681714285714"
+      },
+      {
+        "id": "523af7e9-059d-49b9-a5a7-9852c622ebb8",
+        "position": "2850,308.681714285714"
+      },
+      {
+        "id": "a75484b2-890e-4153-8a52-19fa59332d68",
+        "position": "2775,471.181714285714"
       },
       {
         "id": "c551c11a-ebc5-45e9-9015-97afda312015",
-        "position": "2737.5,358.681714285714"
+        "position": "2762.5,658.681714285714"
       },
       {
-        "id": "e4568532-a4f6-4f0e-bca6-f77e38804d1c",
-        "position": "2962.5,346.181714285714"
+        "id": "121ae642-2a80-42e4-bb1b-ea15f10e5ca8",
+        "position": "3075,471.181714285714"
       }
     ],
     "editorObjects": [],
