@@ -54,8 +54,8 @@ class CfgAvailableBehaviors
 		allowRotate = true;
 
 
-		displayname = "DPRK Advance";
-		description = "DPRK Advance";				
+		displayname = "DPRK AlternatingRetreat";
+		description = "DPRK AlternatingRetreat that uses orderName Advance";				
 
 		orderName = "Advance";
 		prepareActionMessage = "vbs2\vbs_plugins\ai\standard_behaviors\data\scripts\PrepareBTParameters.sqf";
@@ -72,7 +72,7 @@ class CfgAvailableBehaviors
 			class debugEnabled
 			{
 				displayName = "debugEnabled";
-				value = "true";
+				value = "false";
 				type = "boolean";
 			};
 		};

@@ -82,14 +82,6 @@
                   "type": "sequence",
                   "subtrees": [
                     {
-                      "name": "wait 7s until firesquad takes cover",
-                      "id": "ba3ba65b-5414-4fbe-9735-c22289006e93",
-                      "type": "wait",
-                      "time": [
-                        "return 7"
-                      ]
-                    },
-                    {
                       "name": "Set runningFireTeam nil to let other be chosen",
                       "id": "5226f611-6463-4024-9cec-5d3ee071c030",
                       "type": "scriptAction",
@@ -112,7 +104,14 @@
                         "    for i=0,fireTeamsCount-1 do",
                         "        local fireTeam = self:GetChildGroup(i)",
                         "        local soldiersCount = fireTeam:GetEntityCount()",
-                        "        if soldiersCount > 1 then",
+                        "        local aliveSoldiersCount = 0",
+                        "        for s=0, soldiersCount-1 do",
+                        "                local soldier = fireTeam:GetEntity(s)",
+                        "                if soldier:IsAlive() then",
+                        "                    aliveSoldiersCount = aliveSoldiersCount + 1",
+                        "                end",
+                        "        end",
+                        "        if aliveSoldiersCount > 1 then",
                         "            for s=0, soldiersCount-1 do",
                         "                local soldier = fireTeam:GetEntity(s)",
                         "                local distance = soldier:GetPosition():Distance(arg.orderData.destination)",
@@ -141,13 +140,13 @@
                         "    local soldier = fireTeam:GetEntity(s)",
                         "    local distance = soldier:GetPosition():Distance(nextWaypointPosition)",
                         "    --local heading = soldier:GetHeading()",
-                        "    if soldier:IsAlive() and distance > 30 then",
+                        "    if soldier:IsAlive() and distance < 5 then",
                         "        --DebugLog(\"soldier distance: \" ..tostring(distance))",
-                        "        return false ",
+                        "        return true ",
                         "    end",
                         "end",
                         "",
-                        "return true"
+                        "return false"
                       ]
                     }
                   ]
@@ -188,6 +187,14 @@
                       ]
                     },
                     {
+                      "name": "wait 7s until firesquad takes cover",
+                      "id": "ba3ba65b-5414-4fbe-9735-c22289006e93",
+                      "type": "wait",
+                      "time": [
+                        "return 7"
+                      ]
+                    },
+                    {
                       "name": "Clear area for all subordinates",
                       "id": "f10380f0-d393-46d2-80b5-0248edec9c8c",
                       "type": "reference",
@@ -220,7 +227,7 @@
       ]
     },
     {
-      "name": "Find Pos to Move to",
+      "name": "Find path to destination",
       "id": "aad9363e-f73e-4634-9294-ad91860e24c8",
       "type": "sequence",
       "subtrees": [
@@ -340,12 +347,20 @@
             "for i=0,fireTeamsCount-1 do",
             "    local fireTeam = self:GetChildGroup(i)",
             "    local soldiersCount = fireTeam:GetEntityCount()",
-            "    if soldiersCount == 1 then",
+            "    local aliveSoldiersCount = 0",
+            "    for s=0, soldiersCount-1 do",
+            "            local soldier = fireTeam:GetEntity(s)",
+            "            --local distance = soldier:GetPosition():Distance(arg.orderData.destination)",
+            "            --if soldier:IsAlive() and distance > 40 then",
+            "            if soldier:IsAlive() then",
+            "                aliveSoldiersCount = aliveSoldiersCount + 1",
+            "            end",
+            "     end",
+            "    ",
+            "    if aliveSoldiersCount == 1 then",
             "        for s=0, soldiersCount-1 do",
             "            local soldier = fireTeam:GetEntity(s)",
-            "            local distance = soldier:GetPosition():Distance(arg.orderData.destination)",
-            "            ",
-            "            if soldier:IsAlive() and distance > 40 then",
+            "            if soldier:IsAlive() then",
             "                loc.smallFireTeams[#loc.smallFireTeams+1] = fireTeam",
             "            end",
             "        end",
@@ -499,7 +514,7 @@
         "nodesInfo": [
           {
             "id": "e4568532-a4f6-4f0e-bca6-f77e38804d1c",
-            "position": "3137.5,533.681714285714"
+            "position": "3137.5,718.552685714284"
           }
         ],
         "editorObjects": []
@@ -540,120 +555,120 @@
     "nodesInfo": [
       {
         "id": "9d340382-1648-4323-be7d-a539be304d1f",
-        "position": "2037.5,208.681714285714"
+        "position": "2037.5,393.552685714285"
       },
       {
         "id": "17919634-1abc-425d-9b4b-41427e99df08",
-        "position": "1575,321.181714285714"
+        "position": "1575,506.052685714285"
       },
       {
         "id": "f2cb2817-59ef-4332-8bee-a6b6f26a2064",
-        "position": "1350,408.681714285714"
+        "position": "1350,593.552685714285"
       },
       {
         "id": "78dac5d9-35ab-4a2f-aa1d-e4f0b8e43b55",
-        "position": "1562.5,408.681714285714"
+        "position": "1562.5,593.552685714285"
       },
       {
         "id": "22caf228-ca67-4065-af70-79ca73fc7a8b",
-        "position": "1175,496.181714285714"
+        "position": "1175,681.052685714285"
       },
       {
         "id": "38f9ded0-9e3d-4de3-990a-2e7827c4c185",
-        "position": "1050,621.181714285714"
+        "position": "1050,806.052685714284"
       },
       {
         "id": "4b945e70-c600-472d-88a8-b94f3d170999",
-        "position": "1337.5,621.181714285714"
+        "position": "1337.5,806.052685714284"
       },
       {
         "id": "32b07214-bd3e-44cf-b0da-57e86d819211",
-        "position": "1650,496.181714285714"
+        "position": "1650,681.052685714285"
       },
       {
         "id": "4e4d5d27-987f-43b4-b922-caaa32b5525f",
-        "position": "1075,746.181714285714"
-      },
-      {
-        "id": "ba3ba65b-5414-4fbe-9735-c22289006e93",
-        "position": "925,883.681714285714"
+        "position": "1075,931.052685714284"
       },
       {
         "id": "5226f611-6463-4024-9cec-5d3ee071c030",
-        "position": "1200,883.681714285714"
+        "position": "1050,1056.05268571428"
       },
       {
         "id": "b31b5a7d-2689-4451-b0b7-9128048fb3aa",
-        "position": "1700,746.181714285714"
+        "position": "1700,931.052685714284"
       },
       {
         "id": "a49e9721-012c-4a05-94e9-ae0e9f19f43f",
-        "position": "1587.5,883.681714285714"
+        "position": "1500,1156.05268571429"
+      },
+      {
+        "id": "ba3ba65b-5414-4fbe-9735-c22289006e93",
+        "position": "1662.5,1156.05268571429"
       },
       {
         "id": "f10380f0-d393-46d2-80b5-0248edec9c8c",
-        "position": "1775,883.681714285714"
+        "position": "1937.5,1068.55268571429"
       },
       {
         "id": "aad9363e-f73e-4634-9294-ad91860e24c8",
-        "position": "2062.5,333.681714285714"
+        "position": "2062.5,518.552685714285"
       },
       {
         "id": "f2c7a05b-069c-4897-89a8-f838152304dc",
-        "position": "1900,421.181714285714"
+        "position": "1900,606.052685714285"
       },
       {
         "id": "2b57e4fd-62d7-4ef0-b004-3134987e18d8",
-        "position": "2062.5,546.181714285714"
+        "position": "2062.5,731.052685714284"
       },
       {
         "id": "ac6ff361-ff92-4e5c-868c-36fb167c41b2",
-        "position": "2162.5,421.181714285714"
+        "position": "2162.5,606.052685714285"
       },
       {
         "id": "b4a22600-18d6-4dae-80a8-e58aab0219d7",
-        "position": "2575,496.181714285714"
+        "position": "2575,681.052685714285"
       },
       {
         "id": "60649a14-bea6-4520-ac04-2b9b1e99b1b2",
-        "position": "2225,758.681714285714"
+        "position": "2225,943.552685714284"
       },
       {
         "id": "cdb7e30f-0ad7-44ba-bc9f-28f99b32977c",
-        "position": "2412.5,758.681714285714"
+        "position": "2412.5,943.552685714284"
       },
       {
         "id": "d2460527-fee0-474c-b938-942e039d2bb4",
-        "position": "2712.5,758.681714285714"
+        "position": "2712.5,943.552685714284"
       },
       {
         "id": "71b1e0e3-5304-4787-beb0-9dcbf22ec4da",
-        "position": "2553.5,893.148380952381"
+        "position": "2553.5,1078.01935238095"
       },
       {
         "id": "da73671d-4744-4ab5-8e63-490cecc8f7b6",
-        "position": "2791,893.148380952381"
+        "position": "2791,1078.01935238095"
       },
       {
         "id": "523af7e9-059d-49b9-a5a7-9852c622ebb8",
-        "position": "2850,308.681714285714"
+        "position": "2850,493.552685714285"
       },
       {
         "id": "a75484b2-890e-4153-8a52-19fa59332d68",
-        "position": "2912.5,396.181714285714"
+        "position": "2912.5,581.052685714285"
       },
       {
         "id": "c551c11a-ebc5-45e9-9015-97afda312015",
-        "position": "2900,533.681714285714"
+        "position": "2900,718.552685714284"
       },
       {
         "id": "121ae642-2a80-42e4-bb1b-ea15f10e5ca8",
-        "position": "3175,396.181714285714"
+        "position": "3175,581.052685714285"
       }
     ],
     "editorObjects": [],
-    "canvasSize": "4053.65000000001,2571.18171428573",
-    "gridPadding": "0,8.68171428571426"
+    "canvasSize": "4053.65000000001,2756.0526857143",
+    "gridPadding": "0,6.05268571428553"
   },
   "parameters": [
     {
